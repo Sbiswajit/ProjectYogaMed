@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed-master\\ProjectYogaMed.csproj": {}
+    "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed\\ProjectYogaMed.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed-master\\ProjectYogaMed.csproj": {
+    "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed\\ProjectYogaMed.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed-master\\ProjectYogaMed.csproj",
+        "projectUniqueName": "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed\\ProjectYogaMed.csproj",
         "projectName": "ProjectYogaMed",
-        "projectPath": "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed-master\\ProjectYogaMed.csproj",
+        "projectPath": "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed\\ProjectYogaMed.csproj",
         "packagesPath": "C:\\Users\\BISWAJIT\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed-master\\obj\\",
+        "outputPath": "C:\\Users\\BISWAJIT\\Downloads\\ProjectYogaMed\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\BISWAJIT\\AppData\\Roaming\\NuGet\\NuGet.Config",

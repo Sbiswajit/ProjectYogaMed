@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,16 +18,28 @@ public class UserDiseasesController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _env;
-        public UserDiseasesController(ApplicationDbContext context, IWebHostEnvironment env)
+        private readonly UserManager<IdentityUser> _userManager;
+        public UserDiseasesController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _env = env;
+            _userManager = userManager;
         }
 
         // GET: UserDiseases
         public async Task<IActionResult> Index()
         {
-            return View(await _context.UserDisease.ToListAsync());
+            var user = _userManager.GetUserId(HttpContext.User);
+            var Eclaim = from m in _context.UserDisease select m;
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Eclaim");
+            }
+            else
+            {
+                Eclaim = Eclaim.Where(s => s.data.Contains(user));
+            }
+            return View(Eclaim);
         }
 
         // GET: UserDiseases/Details/5
@@ -63,11 +76,24 @@ public class UserDiseasesController : Controller
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Udid,UserIdFk,Disease,DiseaseIdfk")] UserDisease userDisease)
+        public async Task<IActionResult> Create([Bind("Udid,UserIdFk,data,Disease,DiseaseIdfk")] UserDisease userDisease)
         {
+            var x = _context.UserDetails.ToList();
+            var z = 0;
+            foreach (var d in x)
+            {
+                z = d.UserId;
+            }
+            UserDisease obj = new UserDisease
+            {
+                Udid = userDisease.Udid,
+                data = _userManager.GetUserId(HttpContext.User),
+                Disease = userDisease.Disease,
+                UserIdFk = z,
+            };
             if (ModelState.IsValid)
             {
-                _context.Add(userDisease);
+                _context.Add(obj);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

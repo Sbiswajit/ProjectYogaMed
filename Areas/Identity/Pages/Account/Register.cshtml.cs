@@ -13,12 +13,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using ProjectYogaMed.Data;
 
 namespace ProjectYogaMed.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
+        private readonly ApplicationDbContext _context;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
@@ -29,13 +31,14 @@ namespace ProjectYogaMed.Areas.Identity.Pages.Account
             SignInManager<IdentityUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager;
+            _context = context;
         }
 
         [BindProperty]
@@ -77,30 +80,38 @@ namespace ProjectYogaMed.Areas.Identity.Pages.Account
            
                 returnUrl = returnUrl ?? Url.Content("~/");
             var role = _roleManager.FindByIdAsync(Input.Name).Result;
+            var currentuser = await _userManager.FindByNameAsync(Input.Email);
+            if(currentuser!=null)
+            {
+                TempData["Exist"] = "User Alredy Exist";
+                return LocalRedirect("~/Identity/Account/Register");  
+            }
             //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                 if (ModelState.IsValid)
                 {
                     
                     var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
                     var result = await _userManager.CreateAsync(user, Input.Password);
-                    if (result.Succeeded)
-                    {
-                        _logger.LogInformation("User created a new account with password.");
+                                   
+                       if (result.Succeeded)
+                        {
+                            _logger.LogInformation("User created a new account with password.");
 
-                        // code for adding user to role
-                        await _userManager.AddToRoleAsync(user, role.Name);
+                            // code for adding user to role
+                            await _userManager.AddToRoleAsync(user, role.Name);
 
 
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
 
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-                return Page();
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                    
+            }
+            return Page();
 
             
 

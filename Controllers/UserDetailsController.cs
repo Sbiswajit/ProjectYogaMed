@@ -17,19 +17,30 @@ namespace ProjectYogaMed.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-
-        public UserDetailsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager)
+        public UserDetailsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: UserDetails
         public async Task<IActionResult> Index()
         {
-            
-            return View(await _context.UserDetails.ToListAsync());
+
+            var user = _userManager.GetUserId(HttpContext.User);
+            var Eclaim = from m in _context.UserDetails select m;
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Eclaim");
+            }
+            else
+            {
+                Eclaim = Eclaim.Where(s => s.Useremail.Contains(user));
+            }
+            return View(Eclaim);
         }
 
         // GET: UserDetails/Details/5
@@ -63,10 +74,19 @@ namespace ProjectYogaMed.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,Username,Useremail,Usercontact,Dob,Userpassword")] UserDetails userDetails)
         {
+            UserDetails obj = new UserDetails
+            {
+                UserId = userDetails.UserId,
+                Usercontact = userDetails.Usercontact,
+                Useremail = _userManager.GetUserId(HttpContext.User),
+                Dob = userDetails.Dob,
+                Username = userDetails.Username
+
+            };
             if (ModelState.IsValid)
             {
                 
-                _context.Add(userDetails);
+                _context.Add(obj);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

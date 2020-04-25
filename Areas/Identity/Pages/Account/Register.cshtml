@@ -30,8 +30,10 @@
 
             <br>
             <div class="p-4 mb-5 bg-white">
+                
                 <section>
                     <img src="~/images/rhere.jpg" width="460" height="150" />
+                    <div style="color:red">@TempData["Exist"]</div>
                     <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
                         <h4>Create a new account.</h4>
                         <hr />
